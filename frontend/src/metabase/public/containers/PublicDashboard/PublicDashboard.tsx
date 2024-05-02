@@ -184,7 +184,10 @@ const _PublicDashboard = (props: {
   const buttons = !isWithinIframe()
     ? getDashboardActions({
         ...props,
+        dashboard,
         isPublic: true,
+        isFullscreen,
+        isNightMode,
       })
     : [];
 
