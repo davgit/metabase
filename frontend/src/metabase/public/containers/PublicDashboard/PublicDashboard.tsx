@@ -36,7 +36,7 @@ import {
   undoRemoveCardFromDashboard,
 } from "metabase/dashboard/actions";
 import type { FetchCardDataOptions } from "metabase/dashboard/actions/data-fetching/types";
-import { getDashboardActions } from "metabase/dashboard/components/DashboardActions";
+import { getDashboardActions } from "metabase/dashboard/components/DashboardActions/DashboardActions";
 import { DashboardGridConnected } from "metabase/dashboard/components/DashboardGrid";
 import { DashboardTabs } from "metabase/dashboard/components/DashboardTabs";
 import { DashboardControls } from "metabase/dashboard/hoc/DashboardControls";

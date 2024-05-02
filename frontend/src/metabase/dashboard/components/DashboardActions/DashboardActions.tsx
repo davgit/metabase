@@ -3,6 +3,7 @@ import { t } from "ttag";
 import Tooltip from "metabase/core/components/Tooltip";
 import { DashboardEmbedAction } from "metabase/dashboard/components/DashboardEmbedAction/DashboardEmbedAction";
 import { DashboardHeaderButton } from "metabase/dashboard/components/DashboardHeader/DashboardHeader.styled";
+import type { Dashboard } from "metabase-types/api";
 
 import {
   FullScreenButtonIcon,
@@ -10,25 +11,43 @@ import {
   RefreshWidgetButton,
 } from "./DashboardActions.styled";
 
-export const getDashboardActions = props => {
-  const {
-    dashboard,
-    isAdmin,
-    canManageSubscriptions,
-    formInput,
-    isEditing = false,
-    isEmpty = false,
-    isFullscreen,
-    isNightMode,
-    isPublic = false,
-    onNightModeChange,
-    refreshPeriod,
-    setRefreshElapsedHook,
-    onRefreshPeriodChange,
-    onSharingClick,
-    onFullscreenChange,
-    hasNightModeToggle,
-  } = props;
+type GetDashboardActionsProps = {
+  canManageSubscriptions?: boolean;
+  dashboard: Dashboard | null;
+  formInput?: any;
+  hasNightModeToggle?: boolean;
+  isAdmin?: boolean;
+  isEditing?: boolean;
+  isEmpty?: boolean;
+  isFullscreen?: boolean;
+  isNightMode?: boolean;
+  isPublic?: boolean;
+  onFullscreenChange?: (isFullscreen: boolean, isOptionClick: boolean) => void;
+  onNightModeChange?: (isNightMode: boolean) => void;
+  onRefreshPeriodChange?: (period: string) => void;
+  onSharingClick?: () => void;
+  refreshPeriod?: string;
+  setRefreshElapsedHook?: (hook: () => void) => void;
+};
+
+export const getDashboardActions = ({
+  canManageSubscriptions,
+  dashboard,
+  formInput,
+  hasNightModeToggle,
+  isAdmin,
+  isEditing = false,
+  isEmpty = false,
+  isFullscreen = false,
+  isNightMode = false,
+  isPublic = false,
+  onFullscreenChange,
+  onNightModeChange,
+  onRefreshPeriodChange,
+  onSharingClick,
+  refreshPeriod,
+  setRefreshElapsedHook,
+}: GetDashboardActionsProps) => {
   const buttons = [];
 
   const isLoaded = !!dashboard;
@@ -49,7 +68,7 @@ export const getDashboardActions = props => {
   const shouldShowSubscriptionsButton =
     emailConfigured || slackConfigured || isAdmin;
 
-  if (!isEditing && !isEmpty && !isPublic) {
+  if (isLoaded && !isEditing && !isEmpty && !isPublic) {
     // Getting notifications with static text-only cards doesn't make a lot of sense
     if (
       shouldShowSubscriptionsButton &&
@@ -98,7 +117,7 @@ export const getDashboardActions = props => {
             icon={
               <NightModeButtonIcon
                 isNightMode={isNightMode}
-                onClick={() => onNightModeChange(!isNightMode)}
+                onClick={() => onNightModeChange?.(!isNightMode)}
               />
             }
           />
@@ -117,7 +136,7 @@ export const getDashboardActions = props => {
         <span>
           <DashboardHeaderButton
             icon={<FullScreenButtonIcon isFullscreen={isFullscreen} />}
-            onClick={e => onFullscreenChange(!isFullscreen, !e.altKey)}
+            onClick={e => onFullscreenChange?.(!isFullscreen, !e.altKey)}
           />
         </span>
       </Tooltip>,
