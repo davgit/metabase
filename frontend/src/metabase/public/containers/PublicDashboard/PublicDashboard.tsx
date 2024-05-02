@@ -72,12 +72,7 @@ import type {
   QuestionDashboardCard,
 } from "metabase-types/api";
 
-const _PublicDashboard = ({
-  location,
-  params: { uuid, token, dashboardId: dashboardIdParam },
-  isFullscreen,
-  isNightMode,
-}: {
+const _PublicDashboard = (props: {
   location: Location;
   params: {
     uuid: string;
@@ -87,6 +82,13 @@ const _PublicDashboard = ({
   isFullscreen: boolean;
   isNightMode: boolean;
 }) => {
+  const {
+    location,
+    params: { uuid, token, dashboardId: dashboardIdParam },
+    isFullscreen,
+    isNightMode,
+  } = props;
+
   const metadata = useSelector(getMetadata);
   const dashboardId = dashboardIdParam || uuid || token;
   const dashboard = useSelector(getDashboardComplete);
@@ -181,7 +183,7 @@ const _PublicDashboard = ({
 
   const buttons = !isWithinIframe()
     ? getDashboardActions({
-        // ...props,
+        ...props,
         isPublic: true,
       })
     : [];
