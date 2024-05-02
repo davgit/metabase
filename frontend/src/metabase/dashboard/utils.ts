@@ -3,7 +3,7 @@ import _ from "underscore";
 
 import { IS_EMBED_PREVIEW } from "metabase/lib/embed";
 import { SERVER_ERROR_TYPES } from "metabase/lib/errors";
-import { isUUID, isJWT } from "metabase/lib/utils";
+import { isJWT, isUUID } from "metabase/lib/utils";
 import {
   getGenericErrorMessage,
   getPermissionErrorMessage,
@@ -14,22 +14,22 @@ import {
   isStringParameter,
 } from "metabase-lib/v1/parameters/utils/parameter-type";
 import type {
+  ActionDashboardCard,
+  BaseDashboardCard,
   Card,
   CardId,
-  Dashboard,
   DashboardCard,
   DashboardCardLayoutAttrs,
-  QuestionDashboardCard,
+  DashCardDataMap,
   Database,
   Dataset,
-  Parameter,
-  ActionDashboardCard,
   EmbedDataset,
-  BaseDashboardCard,
-  DashCardDataMap,
+  Parameter,
+  QuestionDashboardCard,
   VirtualCard,
-  VirtualDashboardCard,
   VirtualCardDisplay,
+  VirtualDashboardCard,
+  Dashboard,
 } from "metabase-types/api";
 import type { SelectedTabId } from "metabase-types/store";
 
@@ -362,3 +362,11 @@ export function createVirtualCard(display: VirtualCardDisplay): VirtualCard {
     archived: false,
   };
 }
+
+export const getDashboardId = (dashboard: Dashboard): number => {
+  if (typeof dashboard.id === "string") {
+    throw new Error("This dashboard has an invalid id");
+  }
+  const dashboardId: number = dashboard.id;
+  return dashboardId;
+};

@@ -566,6 +566,7 @@ export const ApiKeysApi = {
 };
 
 export const CacheConfigApi = {
+  // FIXME: Might be nice to have a GET for just one item since when looking at a dashboard or question you just need one
   list: GET("/api/cache"),
   update: PUT("/api/cache"),
   delete: DELETE("/api/cache"),

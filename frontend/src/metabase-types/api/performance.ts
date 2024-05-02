@@ -1,4 +1,9 @@
-type Model = "root" | "database" | "collection" | "dashboard" | "question";
+export type Model =
+  | "root"
+  | "database"
+  | "collection"
+  | "dashboard"
+  | "question";
 
 export type StrategyType =
   | "nocache"

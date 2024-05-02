@@ -3,7 +3,7 @@ import type { AnySchema } from "yup";
 import * as Yup from "yup";
 import type { SchemaObjectDescription } from "yup/lib/schema";
 
-import type { Config, Strategy, StrategyType } from "metabase-types/api";
+import type { Config, Model, Strategy, StrategyType } from "metabase-types/api";
 import { DurationUnit } from "metabase-types/api";
 
 import { defaultCron, getFrequencyFromCron } from "./utils";
@@ -13,9 +13,13 @@ export type UpdateTargetId = (
   isFormDirty: boolean,
 ) => void;
 
+type StrategyLabel = string | ((model?: Model) => string);
+
 type StrategyData = {
-  label: string;
-  shortLabel?: string;
+  /**
+   * The human-readable label for the strategy, which can be a string or a function that takes a model and returns a string */
+  label: StrategyLabel;
+  shortLabel?: StrategyLabel;
   validateWith: AnySchema;
 };
 
@@ -99,9 +103,9 @@ export const strategyValidationSchema = Yup.object().test(
 /** Cache invalidation strategies and related metadata */
 export const Strategies: Record<StrategyType, StrategyData> = {
   duration: {
-    label: t`Hours: after a specific number of hours`,
+    label: t`Fixed age: after a fixed number of hours`,
     validateWith: durationStrategyValidationSchema,
-    shortLabel: t`Hours`,
+    shortLabel: t`Fixed age`,
   },
   schedule: {
     label: t`Schedule: at regular intervals`,
@@ -109,8 +113,8 @@ export const Strategies: Record<StrategyType, StrategyData> = {
     validateWith: scheduleStrategyValidationSchema,
   },
   ttl: {
-    label: t`Query duration multiplier: the longer the query takes the longer its cached results persist`,
-    shortLabel: t`Query duration multiplier`,
+    label: t`Calculated age: use a query’s average execution time to determine how long to cache its results`,
+    shortLabel: t`Calculated age`,
     validateWith: multiplierStrategyValidationSchema,
   },
   nocache: {
@@ -119,7 +123,15 @@ export const Strategies: Record<StrategyType, StrategyData> = {
     shortLabel: t`No caching`,
   },
   inherit: {
-    label: t`Use default`,
+    label: (model?: Model) => {
+      switch (model) {
+        case "dashboard":
+          return t`Use default: Unless otherwise specified, the questions here inherit the policy of their database`;
+        default:
+          return t`Use default`;
+      }
+    },
+    shortLabel: t`Use default`,
     validateWith: inheritStrategyValidationSchema,
   },
 };
@@ -128,12 +140,15 @@ const validStrategyNames = new Set(Object.keys(Strategies));
 const isValidStrategyName = (strategy: string): strategy is StrategyType =>
   validStrategyNames.has(strategy);
 
-export const getShortStrategyLabel = (strategy?: Strategy) => {
+export const getLabelString = (label: StrategyLabel, model?: Model) =>
+  typeof label === "string" ? label : label(model);
+
+export const getShortStrategyLabel = (strategy?: Strategy, model?: Model) => {
   if (!strategy) {
     return null;
   }
   const type = Strategies[strategy.type];
-  const mainLabel = type.shortLabel ?? type.label;
+  const mainLabel = getLabelString(type.shortLabel ?? type.label, model);
   if (strategy.type === "schedule") {
     const frequency = getFrequencyFromCron(strategy.schedule);
     return `${mainLabel}: ${frequency}`;

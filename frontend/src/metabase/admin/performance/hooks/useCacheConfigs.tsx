@@ -1,38 +1,33 @@
 import { useEffect, useState } from "react";
 import { useAsync } from "react-use";
+import _ from "underscore";
 
-import { useDatabaseListQuery } from "metabase/common/hooks";
 import { CacheConfigApi } from "metabase/services";
-import type { CacheConfigAPIResponse, Config } from "metabase-types/api";
+import type { CacheConfigAPIResponse, Config, Model } from "metabase-types/api";
 
 import { rootId, translateConfigFromAPI } from "../strategies";
 
 import { useRecentlyTrue } from "./useRecentlyTrue";
 
 export const useCacheConfigs = ({
-  canOverrideRootStrategy,
+  configurableModels,
+  id,
 }: {
-  canOverrideRootStrategy: boolean;
+  configurableModels: Model[];
+  id?: number;
 }) => {
-  const databasesResult = useDatabaseListQuery();
-  const databases = databasesResult.data ?? [];
-
   const configsResult = useAsync(async () => {
-    const rootConfigsFromAPI = (
-      (await CacheConfigApi.list({ model: "root" })) as CacheConfigAPIResponse
-    ).data;
-    const dbConfigsFromAPI = canOverrideRootStrategy
-      ? (
-          (await CacheConfigApi.list({
-            model: "database",
-          })) as CacheConfigAPIResponse
-        ).data
-      : [];
-    const configs = [...rootConfigsFromAPI, ...dbConfigsFromAPI].map(config =>
-      translateConfigFromAPI(config),
+    const configsForEachModel = await Promise.all(
+      configurableModels.map(model =>
+        CacheConfigApi.list({ model, id }).then(
+          (response: CacheConfigAPIResponse) => response.data,
+        ),
+      ),
     );
-    return configs;
-  }, []);
+    const configs = _.flatten(configsForEachModel);
+    const translatedConfigs = configs.map(translateConfigFromAPI);
+    return translatedConfigs;
+  }, [configurableModels, id]);
 
   const configsFromAPI = configsResult.value;
 
@@ -53,11 +48,10 @@ export const useCacheConfigs = ({
     3000,
   );
 
-  const error = databasesResult.error || configsResult.error;
-  const loading = databasesResult.isLoading || configsResult.loading;
+  const error = configsResult.error;
+  const loading = configsResult.loading;
 
   return {
-    databases,
     error,
     loading,
     configs,
