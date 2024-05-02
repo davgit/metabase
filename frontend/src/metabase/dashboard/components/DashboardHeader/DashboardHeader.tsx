@@ -26,7 +26,7 @@ import {
   toggleSidebar,
 } from "metabase/dashboard/actions";
 import { trackExportDashboardToPDF } from "metabase/dashboard/analytics";
-import { getDashboardActions } from "metabase/dashboard/components/DashboardActions/DashboardActions";
+import { getDashboardActions } from "metabase/dashboard/components/DashboardActions";
 import { DashboardBookmark } from "metabase/dashboard/components/DashboardBookmark";
 import { ParametersPopover } from "metabase/dashboard/components/ParametersPopover";
 import { TextOptionsButton } from "metabase/dashboard/components/TextOptions/TextOptionsButton";
