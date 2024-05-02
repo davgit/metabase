@@ -72,25 +72,38 @@ import type {
   QuestionDashboardCard,
 } from "metabase-types/api";
 
-const _PublicDashboard = (props: {
+type PublicDashboardProps = {
   location: Location;
   params: {
     uuid: string;
-    token: string;
-    dashboardId: string;
+    tabSlug?: string;
+    token?: string;
+    dashboardId?: string;
   };
+  hasNightModeToggle: boolean;
   isFullscreen: boolean;
   isNightMode: boolean;
-}) => {
-  const {
-    location,
-    params: { uuid, token, dashboardId: dashboardIdParam },
-    isFullscreen,
-    isNightMode,
-  } = props;
+  onFullscreenChange: (isFullscreen: boolean) => void;
+  onNightModeChange: (isNightMode: boolean) => void;
+  onRefreshPeriodChange: (refreshPeriod: number | null) => void;
+  refreshPeriod?: number | null;
+  setRefreshElapsedHook?: (hook: () => void) => void;
+};
 
+const _PublicDashboard = ({
+  location,
+  params: { uuid, token, dashboardId: dashboardIdParam },
+  hasNightModeToggle,
+  isFullscreen,
+  isNightMode,
+  onFullscreenChange,
+  onNightModeChange,
+  onRefreshPeriodChange,
+  refreshPeriod,
+  setRefreshElapsedHook,
+}: PublicDashboardProps) => {
   const metadata = useSelector(getMetadata);
-  const dashboardId = dashboardIdParam || uuid || token;
+  const dashboardId = String(dashboardIdParam || uuid || token);
   const dashboard = useSelector(getDashboardComplete);
   const parameters = useSelector(getParameters);
   const parameterValues = useSelector(getParameterValues);
@@ -114,7 +127,7 @@ const _PublicDashboard = (props: {
 
     const result = await dispatch(
       fetchDashboard({
-        dashId: uuid || token,
+        dashId: String(uuid || token),
         queryParams: location.query,
       }),
     );
@@ -183,11 +196,16 @@ const _PublicDashboard = (props: {
 
   const buttons = !isWithinIframe()
     ? getDashboardActions({
-        ...props,
         dashboard,
-        isPublic: true,
+        onFullscreenChange,
+        hasNightModeToggle,
+        onNightModeChange,
+        onRefreshPeriodChange,
+        refreshPeriod,
+        setRefreshElapsedHook,
         isFullscreen,
         isNightMode,
+        isPublic: true,
       })
     : [];
 
