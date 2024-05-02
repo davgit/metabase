@@ -119,7 +119,7 @@ interface DashboardGridProps {
 
   removeCardFromDashboard: (options: {
     dashcardId: DashCardId;
-    cardId?: CardId | null;
+    cardId: CardId | null;
   }) => void;
   undoRemoveCardFromDashboard: (options: { dashcardId: DashCardId }) => void;
 

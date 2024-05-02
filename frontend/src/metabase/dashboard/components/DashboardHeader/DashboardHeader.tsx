@@ -3,7 +3,6 @@ import type { Location } from "history";
 import { type MouseEvent, type ReactNode, useState, Fragment } from "react";
 import { useMount } from "react-use";
 import { msgid, ngettext, t } from "ttag";
-import _ from "underscore";
 
 import { isInstanceAnalyticsCollection } from "metabase/collections/utils";
 import {

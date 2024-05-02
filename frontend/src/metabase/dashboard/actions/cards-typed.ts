@@ -157,7 +157,17 @@ export const addCardToDashboard =
       }),
     );
 
-    dispatch(fetchCardData(card, dashcard, { reload: true, clearCache: true }));
+    dispatch(
+      fetchCardData(
+        card,
+        // the above dispatch sets the type of dashcard to unknown
+        dashcard as DashboardCard,
+        {
+          reload: true,
+          clearCache: true,
+        },
+      ),
+    );
     await dispatch(loadMetadataForDashboard([dashcard]));
     dispatch(autoWireParametersToNewCard({ dashcard_id: dashcardId }));
   };
@@ -239,16 +249,21 @@ export const replaceCard =
     dashboardId && trackQuestionReplaced(dashboardId);
   };
 
+export type RemoveCardFromDashboardOpts = {
+  dashcardId: DashCardId;
+  cardId: CardId | null;
+};
 export const removeCardFromDashboard = createThunkAction<
-  [{ dashcardId: DashCardId; cardId: CardId }]
+  [RemoveCardFromDashboardOpts]
 >(REMOVE_CARD_FROM_DASH, ({ dashcardId, cardId }) => dispatch => {
   // @ts-expect-error — data-fetching.js actions must be converted to TypeScript
   dispatch(cancelFetchCardData(cardId, dashcardId));
   return { dashcardId };
 });
 
+export type UndoRemoveCardFromDashboardOpts = { dashcardId: DashCardId };
 export const undoRemoveCardFromDashboard = createThunkAction<
-  [{ dashcardId: DashCardId }]
+  [UndoRemoveCardFromDashboardOpts]
 >(UNDO_REMOVE_CARD_FROM_DASH, ({ dashcardId }) => (dispatch, getState) => {
   const dashcard = getDashCardById(getState(), dashcardId);
   const card = dashcard.card;

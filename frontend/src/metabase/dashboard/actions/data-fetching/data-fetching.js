@@ -27,7 +27,7 @@ import {
 import { getParameterValuesBySlug } from "metabase-lib/v1/parameters/utils/parameter-values";
 import { applyParameters } from "metabase-lib/v1/queries/utils/card";
 
-import { DASHBOARD_SLOW_TIMEOUT } from "../constants";
+import { DASHBOARD_SLOW_TIMEOUT } from "../../constants";
 import {
   getDashboardComplete,
   getDashCardBeforeEditing,
@@ -38,7 +38,7 @@ import {
   getDashCardById,
   getSelectedTabId,
   getQuestions,
-} from "../selectors";
+} from "../../selectors";
 import {
   expandInlineDashboard,
   isVirtualDashCard,
@@ -46,9 +46,8 @@ import {
   getDashboardType,
   fetchDataOrError,
   getCurrentTabDashboardCards,
-} from "../utils";
-
-import { loadMetadataForDashboard } from "./metadata";
+} from "../../utils";
+import { loadMetadataForDashboard } from "../metadata";
 
 // normalizr schemas
 const dashcard = new schema.Entity("dashcard");
@@ -141,6 +140,20 @@ let fetchDashboardCancellation;
 
 export const fetchDashboard = createAsyncThunk(
   "metabase/dashboard/FETCH_DASHBOARD",
+  /**
+   * @async
+   * @param {Object} args
+   *   @param {string} args.dashId
+   *   @param {Object} [args.queryParams]
+   *   @param getState
+   *   @param dispatch
+   *   @param rejectWithValue
+   *   @param fulfillWithValue
+   *   @param {Object} [args.options]
+   *     @param {boolean} [args.options.preserveParameters=false]
+   *     @param {boolean} [args.options.clearCache=true]
+   * @returns {Promise<import("metabase/dashboard/types").FetchDashboardResult>}
+   */
   async (
     {
       dashId,
@@ -293,6 +306,11 @@ export const fetchDashboard = createAsyncThunk(
 
 export const fetchCardData = createThunkAction(
   FETCH_CARD_DATA,
+  /**
+   *  @param card {import("metabase-types/api").StoreDashCard|import("metabase-types/store/dashboard").StoreDashcard}
+   *  @param dashcard {import("metabase-types/api").DashboardCard}
+   *  @param options {import("./types").FetchCardDataOptions}
+   */
   function (card, dashcard, { reload, clearCache, ignoreCache } = {}) {
     return async function (dispatch, getState) {
       dispatch({
@@ -480,8 +498,13 @@ export const fetchCardData = createThunkAction(
   },
 );
 
+/**
+ * @export
+ * @async
+ * @param {import("./types").FetchDashboardCardDataOptions} args
+ */
 export const fetchDashboardCardData =
-  ({ isRefreshing, ...options } = {}) =>
+  ({ isRefreshing = false, ...options } = {}) =>
   (dispatch, getState) => {
     const dashboard = getDashboardComplete(getState());
     const selectedTabId = getSelectedTabId(getState());

@@ -5,6 +5,7 @@ import type {
   Dashboard,
   DashboardCard,
   DashboardId,
+  BaseDashboardCard,
 } from "metabase-types/api";
 import type { Dispatch } from "metabase-types/store";
 
@@ -38,7 +39,7 @@ export const setDashboardAttributes = createAction<SetDashboardAttributesOpts>(
 
 export type SetDashCardAttributesOpts = {
   id: DashCardId;
-  attributes: Partial<DashboardCard>;
+  attributes: Partial<DashboardCard> | Partial<BaseDashboardCard>;
 };
 export const SET_DASHCARD_ATTRIBUTES =
   "metabase/dashboard/SET_DASHCARD_ATTRIBUTES";

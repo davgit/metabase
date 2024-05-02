@@ -9,7 +9,7 @@ import {
 } from "metabase-types/api/mocks";
 import { createMockDashboardState } from "metabase-types/store/mocks";
 
-import { dashboardReducers } from "../reducers";
+import { dashboardReducers } from "../../reducers";
 
 import { fetchDashboard } from "./data-fetching";
 
