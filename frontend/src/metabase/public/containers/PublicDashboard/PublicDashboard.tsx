@@ -117,7 +117,7 @@ const _PublicDashboard = ({
       }),
     );
 
-    if (result.error) {
+    if ("error" in result && result.error) {
       dispatch(setErrorPage(result.payload));
       return;
     }
