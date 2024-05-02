@@ -332,6 +332,7 @@ export const fetchCardData = createThunkAction(
       }
 
       const dashboardType = getDashboardType(dashcard.dashboard_id);
+      console.log({ dashboardType });
 
       const { dashboardId, dashboards, parameterValues, dashcardData } =
         getState().dashboard;
@@ -412,6 +413,7 @@ export const fetchCardData = createThunkAction(
           ),
         );
       } else if (dashboardType === "public") {
+        console.log("Dashboard type is public");
         result = await fetchDataOrError(
           maybeUsePivotEndpoint(PublicApi.dashboardCardQuery, card)(
             {
@@ -426,7 +428,20 @@ export const fetchCardData = createThunkAction(
             queryOptions,
           ),
         );
+        console.log("triggered fetchData");
       } else if (dashboardType === "embed") {
+        console.log("Dashboard type is embed");
+        console.log(
+          {
+            card,
+            token: dashcard.dashboard_id,
+            dashcardId: dashcard.id,
+            cardId: card.id,
+            ...getParameterValuesBySlug(dashboard.parameters, parameterValues),
+            ignore_cache: ignoreCache,
+          },
+          queryOptions,
+        );
         result = await fetchDataOrError(
           maybeUsePivotEndpoint(EmbedApi.dashboardCardQuery, card)(
             {
@@ -442,6 +457,7 @@ export const fetchCardData = createThunkAction(
             queryOptions,
           ),
         );
+        console.log("triggered fetchData");
       } else if (dashboardType === "transient" || dashboardType === "inline") {
         result = await fetchDataOrError(
           maybeUsePivotEndpoint(MetabaseApi.dataset, card)(

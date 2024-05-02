@@ -138,9 +138,8 @@ const _PublicDashboard = ({
     }
 
     try {
-      if (hasNoTabs) {
-        dispatch(fetchDashboardCardData({ reload: false, clearCache: true }));
-      }
+      console.log("trying fetchDashboardCardData", hasNoTabs);
+      dispatch(fetchDashboardCardData({ reload: false, clearCache: true }));
     } catch (error) {
       console.error(error);
       dispatch(setErrorPage(error));
@@ -160,16 +159,43 @@ const _PublicDashboard = ({
   });
 
   useEffect(() => {
+    console.log({
+      "dashboardId !== prevProps?.dashboardId":
+        dashboardId !== prevProps?.dashboardId,
+      "!isEqual(prevProps?.selectedTabId, selectedTabId)": !_.isEqual(
+        prevProps?.selectedTabId,
+        selectedTabId,
+      ),
+      "!isEqual(parameterValues, prevProps?.parameterValues)": !_.isEqual(
+        parameterValues,
+        prevProps?.parameterValues,
+      ),
+    });
+
     if (dashboardId !== prevProps?.dashboardId) {
       _initialize();
-    } else if (!_.isEqual(prevProps?.selectedTabId, selectedTabId)) {
+      return;
+    }
+
+    if (!_.isEqual(prevProps?.selectedTabId, selectedTabId)) {
       dispatch(fetchDashboardCardData());
       dispatch(fetchDashboardCardMetadata());
       return;
-    } else if (!_.isEqual(parameterValues, prevProps?.parameterValues)) {
+    }
+
+    if (!_.isEqual(parameterValues, prevProps?.parameterValues)) {
       dispatch(fetchDashboardCardData({ reload: false, clearCache: true }));
     }
-  });
+  }, [
+    _initialize,
+    dashboardId,
+    dispatch,
+    parameterValues,
+    prevProps?.dashboardId,
+    prevProps?.parameterValues,
+    prevProps?.selectedTabId,
+    selectedTabId,
+  ]);
 
   const getCurrentTabDashcards = () => {
     if (!Array.isArray(dashboard?.dashcards)) {
