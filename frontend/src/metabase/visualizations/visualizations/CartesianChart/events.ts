@@ -182,6 +182,15 @@ export const getStackedTooltipModel = (
   seriesIndex: number,
   dataIndex: number,
 ) => {
+  const hoveredSeries = chartModel.seriesModels[seriesIndex];
+  const seriesStack = chartModel.stackModels.find(stackModel =>
+    stackModel.seriesKeys.includes(hoveredSeries.dataKey),
+  );
+
+  if (!seriesStack) {
+    return null;
+  }
+
   const column =
     chartModel.leftAxisModel?.column ?? chartModel.rightAxisModel?.column;
 
@@ -194,17 +203,23 @@ export const getStackedTooltipModel = (
       }),
     );
 
-  const rows: TooltipRowModel[] = chartModel.seriesModels.map(seriesModel => {
-    return {
-      name: seriesModel.name,
-      color: seriesModel.color,
-      value: chartModel.dataset[dataIndex][seriesModel.dataKey],
-      formatter,
-    };
-  });
+  const rows: (TooltipRowModel & { dataKey: DataKey })[] =
+    chartModel.seriesModels
+      .filter(seriesModel =>
+        seriesStack?.seriesKeys.includes(seriesModel.dataKey),
+      )
+      .map(seriesModel => {
+        return {
+          dataKey: seriesModel.dataKey,
+          name: seriesModel.name,
+          color: seriesModel.color,
+          value: chartModel.dataset[dataIndex][seriesModel.dataKey],
+          formatter,
+        };
+      });
   const [headerRows, bodyRows] = _.partition(
     rows,
-    (_row, index) => index === seriesIndex,
+    row => row.dataKey === hoveredSeries.dataKey,
   );
 
   const dimensionValue = chartModel.dataset[dataIndex][X_AXIS_DATA_KEY];
@@ -303,6 +318,10 @@ export const getSeriesHoverData = (
   }
 
   const data = getEventColumnsData(chartModel, seriesIndex, dataIndex);
+
+  // const isSeriesComparisonTooltipEnabled =
+  //   settings["graph.tooltip_type"] === "series_comparison";
+  // const isStackedSeries = chartModel.seriesModels[seriesIndex];
 
   const stackedTooltipModel =
     settings["graph.tooltip_type"] === "series_comparison"
