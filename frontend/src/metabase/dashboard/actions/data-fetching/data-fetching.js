@@ -143,7 +143,7 @@ export const fetchDashboard = createAsyncThunk(
   /**
    * @async
    * @param {Object} args
-   *   @param {string} args.dashId
+   *   @param {import("metabase-types/api").DashboardId} args.dashId
    *   @param {Object} [args.queryParams]
    *   @param getState
    *   @param dispatch
@@ -229,7 +229,7 @@ export const fetchDashboard = createAsyncThunk(
         // HACK: this is horrible but the easiest way to get "inline" dashboards up and running
         // pass the dashboard in as dashboardId, and replace the id with [object Object] because
         // that's what it will be when cast to a string
-        result = expandInlineDashboard(dashId);
+        result = expandInlineDashboard(loadedDashboard);
         dashId = result.id = String(dashId);
       } else {
         result = await DashboardApi.get(

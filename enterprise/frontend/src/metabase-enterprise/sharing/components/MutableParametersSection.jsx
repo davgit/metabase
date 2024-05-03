@@ -8,7 +8,7 @@ import _ from "underscore";
 import CollapseSection from "metabase/components/CollapseSection";
 import CS from "metabase/css/core/index.css";
 import { getPulseParameters } from "metabase/lib/pulse";
-import ParametersList from "metabase/parameters/components/ParametersList";
+import { ParametersList } from "metabase/parameters/components/ParametersList";
 import {
   getDefaultValuePopulatedParameters,
   PULSE_PARAM_USE_DEFAULT,

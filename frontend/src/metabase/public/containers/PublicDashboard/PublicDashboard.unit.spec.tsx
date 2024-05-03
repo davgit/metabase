@@ -2,13 +2,12 @@ import { Route } from "react-router";
 
 import { setupEmbedDashboardEndpoints } from "__support__/server-mocks/embed";
 import { renderWithProviders, screen } from "__support__/ui";
+import { PublicDashboardWrapper } from "metabase/public/containers/PublicDashboard/PublicDashboardWrapper";
 import {
   createMockDashboard,
   createMockDashboardTab,
 } from "metabase-types/api/mocks";
 import { createMockState } from "metabase-types/store/mocks";
-
-import { PublicDashboard } from "./PublicDashboard";
 
 const MOCK_TOKEN =
   "eyJhbGciOiJIUzI1NiJ9.eyJyZXNvdXJjZSI6eyJkYXNoYm9hcmQiOjExfSwicGFyYW1zIjp7fSwiaWF0IjoxNzEyNjg0NTA1LCJfZW1iZWRkaW5nX3BhcmFtcyI6e319.WbZTB-cQYh4gjh61ZzoLOcFbJ6j6RlOY3GS4fwzv3W4";
@@ -100,7 +99,7 @@ async function setup({
   setupEmbedDashboardEndpoints(MOCK_TOKEN, dashboard);
 
   renderWithProviders(
-    <Route path="embed/dashboard/:token" component={PublicDashboard} />,
+    <Route path="embed/dashboard/:token" component={PublicDashboardWrapper} />,
     {
       storeInitialState: createMockState(),
       withRouter: true,

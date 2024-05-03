@@ -20,16 +20,6 @@ export const Root = styled.div<{
   overflow: auto;
 
   ${props =>
-    props.hasScroll &&
-    css`
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    `}
-
-  ${props =>
     props.isBordered &&
     css`
       border: 1px solid ${color("border")};

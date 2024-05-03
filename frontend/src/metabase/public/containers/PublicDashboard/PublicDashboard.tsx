@@ -1,5 +1,5 @@
 import cx from "classnames";
-import type { Location, LocationDescriptor } from "history";
+import type { LocationDescriptor } from "history";
 import { assoc } from "icepick";
 import { useCallback, useEffect } from "react";
 import { push } from "react-router-redux";
@@ -39,7 +39,6 @@ import type { FetchCardDataOptions } from "metabase/dashboard/actions/data-fetch
 import { getDashboardActions } from "metabase/dashboard/components/DashboardActions";
 import { DashboardGridConnected } from "metabase/dashboard/components/DashboardGrid";
 import { DashboardTabs } from "metabase/dashboard/components/DashboardTabs";
-import { DashboardControls } from "metabase/dashboard/hoc/DashboardControls";
 import {
   getDashboardComplete,
   getParameters,
@@ -55,12 +54,9 @@ import { useDispatch, useSelector } from "metabase/lib/redux";
 import ParametersS from "metabase/parameters/components/ParameterValueWidget.module.css";
 import EmbedFrame from "metabase/public/components/EmbedFrame/EmbedFrame";
 import { DashboardContainer } from "metabase/public/containers/PublicDashboard/PublicDashboard.styled";
+import type { EmbeddingDisplayOptions } from "metabase/public/lib/types";
 import { setErrorPage } from "metabase/redux/app";
 import { getMetadata } from "metabase/selectors/metadata";
-import {
-  setEmbedDashboardEndpoints,
-  setPublicDashboardEndpoints,
-} from "metabase/services";
 import type { Mode } from "metabase/visualizations/click-actions/Mode";
 import { PublicMode } from "metabase/visualizations/click-actions/modes/PublicMode";
 import type {
@@ -70,29 +66,29 @@ import type {
   CardId,
   DashCardId,
   QuestionDashboardCard,
+  DashboardId,
 } from "metabase-types/api";
 
 type PublicDashboardProps = {
-  location: Location;
-  params: {
-    uuid: string;
-    tabSlug?: string;
-    token?: string;
-    dashboardId?: string;
-  };
-  hasNightModeToggle: boolean;
-  isFullscreen: boolean;
-  isNightMode: boolean;
-  onFullscreenChange: (isFullscreen: boolean) => void;
-  onNightModeChange: (isNightMode: boolean) => void;
-  onRefreshPeriodChange: (refreshPeriod: number | null) => void;
+  id: DashboardId;
+  tabId?: string | null;
+  queryParams: Record<ParameterId, any>;
+  hasNightModeToggle?: boolean;
+  isFullscreen?: boolean;
+  isNightMode?: boolean;
+  onFullscreenChange?: (isFullscreen: boolean) => void;
+  onNightModeChange?: (isNightMode: boolean) => void;
+  onRefreshPeriodChange?: (refreshPeriod: number | null) => void;
   refreshPeriod?: number | null;
   setRefreshElapsedHook?: (hook: () => void) => void;
+  embedOptions: Partial<EmbeddingDisplayOptions>;
+  hideParameters?: boolean;
 };
 
-const _PublicDashboard = ({
-  location,
-  params: { uuid, token, dashboardId: dashboardIdParam },
+export const PublicDashboard = ({
+  id,
+  // tabId = null,
+  queryParams,
   hasNightModeToggle,
   isFullscreen,
   isNightMode,
@@ -101,9 +97,11 @@ const _PublicDashboard = ({
   onRefreshPeriodChange,
   refreshPeriod,
   setRefreshElapsedHook,
+  embedOptions,
+  hideParameters,
 }: PublicDashboardProps) => {
   const metadata = useSelector(getMetadata);
-  const dashboardId = String(dashboardIdParam || uuid || token);
+
   const dashboard = useSelector(getDashboardComplete);
   const parameters = useSelector(getParameters);
   const parameterValues = useSelector(getParameterValues);
@@ -119,18 +117,12 @@ const _PublicDashboard = ({
   const shouldLoadCardsInTab = dashboard?.tabs?.length === 0;
 
   const _initialize = useCallback(async () => {
-    if (uuid) {
-      setPublicDashboardEndpoints();
-    } else if (token) {
-      setEmbedDashboardEndpoints();
-    }
-
     initialize();
 
     const result = await dispatch(
       fetchDashboard({
-        dashId: String(uuid || token),
-        queryParams: location.query,
+        dashId: id,
+        queryParams,
       }),
     );
 
@@ -147,7 +139,7 @@ const _PublicDashboard = ({
       console.error(error);
       dispatch(setErrorPage(error));
     }
-  }, [shouldLoadCardsInTab, dispatch, location.query, token, uuid]);
+  }, [shouldLoadCardsInTab, id, dispatch, queryParams]);
 
   useEffect(() => {
     return () => {
@@ -156,13 +148,13 @@ const _PublicDashboard = ({
   }, [dispatch]);
 
   const prevProps = usePrevious({
-    dashboardId,
+    id,
     selectedTabId,
     parameterValues,
   });
 
   useEffect(() => {
-    if (dashboardId !== prevProps?.dashboardId) {
+    if (id !== prevProps?.id) {
       _initialize();
       return;
     }
@@ -178,10 +170,10 @@ const _PublicDashboard = ({
     }
   }, [
     _initialize,
-    dashboardId,
+    id,
     dispatch,
     parameterValues,
-    prevProps?.dashboardId,
+    prevProps?.id,
     prevProps?.parameterValues,
     prevProps?.selectedTabId,
     selectedTabId,
@@ -250,10 +242,10 @@ const _PublicDashboard = ({
       }
       dashboardTabs={
         dashboard?.tabs &&
-        dashboard?.tabs?.length > 1 && (
-          <DashboardTabs dashboardId={dashboardId} location={location} />
-        )
+        dashboard?.tabs?.length > 1 && <DashboardTabs dashboardId={id} />
       }
+      embedOptions={embedOptions}
+      hideParameters={hideParameters}
     >
       <LoadingAndErrorWrapper
         className={cx({
@@ -343,5 +335,3 @@ const _PublicDashboard = ({
     </EmbedFrame>
   );
 };
-
-export const PublicDashboard = DashboardControls(_PublicDashboard);

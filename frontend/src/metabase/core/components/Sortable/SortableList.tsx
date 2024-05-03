@@ -19,7 +19,7 @@ export type DragEndEvent = {
   itemIds: ItemId[];
 };
 
-interface RenderItemProps<T> {
+export interface RenderItemProps<T> {
   item: T;
   id: ItemId;
   isDragOverlay?: boolean;

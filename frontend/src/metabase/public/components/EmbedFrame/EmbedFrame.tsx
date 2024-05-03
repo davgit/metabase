@@ -1,5 +1,4 @@
 import cx from "classnames";
-import type { Location } from "history";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
@@ -13,17 +12,15 @@ import {
   FixedWidthContainer,
   ParametersFixedWidthContainer,
 } from "metabase/dashboard/components/Dashboard/Dashboard.styled";
-import { parseHashOptions } from "metabase/lib/browser";
 import {
   initializeIframeResizer,
   isSmallScreen,
   isWithinIframe,
 } from "metabase/lib/dom";
-import { useDispatch } from "metabase/lib/redux";
 import { FilterApplyButton } from "metabase/parameters/components/FilterApplyButton";
-import SyncedParametersList from "metabase/parameters/components/SyncedParametersList/SyncedParametersList";
+import { ParametersList } from "metabase/parameters/components/ParametersList";
 import { getVisibleParameters } from "metabase/parameters/utils/ui";
-import { setOptions } from "metabase/redux/embed";
+import type { EmbeddingDisplayOptions } from "metabase/public/lib/types";
 import { getSetting } from "metabase/selectors/settings";
 import type Question from "metabase-lib/v1/Question";
 import { getValuePopulatedParameters } from "metabase-lib/v1/parameters/utils/parameter-values";
@@ -72,24 +69,21 @@ interface OwnProps {
   setParameterValueToDefault: (id: ParameterId) => void;
   children: ReactNode;
   dashboardTabs?: ReactNode;
+
+  embedOptions: EmbeddingDisplayOptions;
+
+  isFullscreen?: boolean;
+  isNightMode?: boolean;
+  editingParameter?: Parameter;
+  isEditing?: boolean;
+  setEditingParameter?: (param: Parameter) => void;
 }
 
 interface StateProps {
   hasEmbedBranding: boolean;
 }
 
-type Props = OwnProps &
-  StateProps & {
-    location: Location;
-  };
-
-interface HashOptions {
-  bordered?: boolean;
-  titled?: boolean;
-  theme?: "night" | "transparent";
-  hide_parameters?: string;
-  hide_download_button?: boolean;
-}
+type Props = OwnProps & StateProps;
 
 function mapStateToProps(state: State) {
   return {
@@ -97,8 +91,8 @@ function mapStateToProps(state: State) {
   };
 }
 
-const EMBED_THEME_CLASSES = (theme: HashOptions["theme"]) => {
-  if (!theme) {
+const EMBED_THEME_CLASSES = (theme?: EmbeddingDisplayOptions["theme"]) => {
+  if (!theme || theme === "light") {
     return null;
   }
 
@@ -121,7 +115,6 @@ function EmbedFrame({
   actionButtons,
   dashboardTabs = null,
   footerVariant = "default",
-  location,
   hasEmbedBranding,
   parameters,
   parameterValues,
@@ -130,11 +123,25 @@ function EmbedFrame({
   setParameterValue,
   setParameterValueToDefault,
   enableParameterRequiredBehavior,
+  embedOptions,
+  isFullscreen,
+  isNightMode,
+  editingParameter,
+  isEditing,
+  setEditingParameter,
 }: Props) {
   const [hasFrameScroll, setHasFrameScroll] = useState(true);
   const [hasInnerScroll, setHasInnerScroll] = useState(
     document.documentElement.scrollTop > 0,
   );
+
+  const {
+    bordered = isWithinIframe(),
+    hide_parameters = "",
+    hide_download_button = false,
+    theme = "light",
+    titled = true,
+  } = embedOptions ?? {};
 
   useMount(() => {
     initializeIframeResizer(() => setHasFrameScroll(false));
@@ -152,19 +159,6 @@ function EmbedFrame({
 
     return () => document.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(setOptions(location));
-  }, [dispatch, location]);
-
-  const {
-    bordered = isWithinIframe(),
-    titled = true,
-    theme,
-    hide_parameters,
-    hide_download_button,
-  } = parseHashOptions(location.hash) as HashOptions;
 
   const hideParameters = [hide_parameters, hiddenParameterSlugs]
     .filter(Boolean)
@@ -243,7 +237,7 @@ function EmbedFrame({
               data-testid="fixed-width-filters"
               isFixedWidth={dashboard?.width === "fixed"}
             >
-              <SyncedParametersList
+              <ParametersList
                 question={question}
                 dashboard={dashboard}
                 parameters={getValuePopulatedParameters({
@@ -258,6 +252,11 @@ function EmbedFrame({
                 enableParameterRequiredBehavior={
                   enableParameterRequiredBehavior
                 }
+                isFullscreen={isFullscreen}
+                isNightMode={isNightMode}
+                editingParameter={editingParameter}
+                isEditing={isEditing}
+                setEditingParameter={setEditingParameter}
               />
               {dashboard && <FilterApplyButton />}
             </ParametersFixedWidthContainer>
