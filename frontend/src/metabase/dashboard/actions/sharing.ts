@@ -4,7 +4,7 @@ import { DashboardApi } from "metabase/services";
 import type { Dashboard, DashboardId } from "metabase-types/api";
 import type { Dispatch, EmbedOptions } from "metabase-types/store";
 
-import { setSidebar, closeSidebar } from "./ui/ui";
+import { setSidebar, closeSidebar } from "./ui";
 
 type DashboardIdPayload = {
   id: DashboardId;

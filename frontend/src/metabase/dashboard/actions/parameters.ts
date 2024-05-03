@@ -53,7 +53,7 @@ import {
 import { isQuestionDashCard } from "../utils";
 
 import { setDashboardAttributes, setDashCardAttributes } from "./core";
-import { closeSidebar, setSidebar } from "./ui/ui";
+import { closeSidebar, setSidebar } from "./ui";
 
 type SingleParamUpdater = (p: Parameter) => Parameter;
 

@@ -7,6 +7,6 @@ export * from "./parameters";
 export * from "./revisions";
 export * from "./save";
 export * from "./sharing";
-export * from "./ui/ui";
+export * from "./ui";
 export * from "./actions";
 export * from "./tabs";
