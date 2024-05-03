@@ -309,7 +309,17 @@ export const setParameterFilteringParameters = createThunkAction(
 );
 
 export const SET_PARAMETER_VALUE = "metabase/dashboard/SET_PARAMETER_VALUE";
-export const setParameterValue = createThunkAction(
+
+export type SetParameterValueAction = (
+  parameterId: ParameterId,
+  value: any,
+) => {
+  id: ParameterId;
+  value: any;
+  isDraft: boolean;
+};
+
+export const setParameterValue: SetParameterValueAction = createThunkAction(
   SET_PARAMETER_VALUE,
   (parameterId: ParameterId, value: any) => (_dispatch, getState) => {
     const isSettingDraftParameterValues = !getIsAutoApplyFilters(getState());
@@ -351,18 +361,23 @@ export const setParameterDefaultValue = createThunkAction(
 
 export const SET_PARAMETER_VALUE_TO_DEFAULT =
   "metabase/dashboard/SET_PARAMETER_VALUE_TO_DEFAULT";
-export const setParameterValueToDefault = createThunkAction(
-  SET_PARAMETER_VALUE_TO_DEFAULT,
-  (parameterId: ParameterId) => (dispatch, getState) => {
-    const parameter = getParameters(getState()).find(
-      ({ id }) => id === parameterId,
-    );
-    const defaultValue = parameter?.default;
-    if (defaultValue) {
-      dispatch(setParameterValue(parameterId, defaultValue));
-    }
-  },
-);
+
+export type SetParameterValueToDefaultAction = (
+  parameterId: ParameterId,
+) => void;
+export const setParameterValueToDefault: SetParameterValueToDefaultAction =
+  createThunkAction(
+    SET_PARAMETER_VALUE_TO_DEFAULT,
+    (parameterId: ParameterId) => (dispatch, getState) => {
+      const parameter = getParameters(getState()).find(
+        ({ id }) => id === parameterId,
+      );
+      const defaultValue = parameter?.default;
+      if (defaultValue) {
+        dispatch(setParameterValue(parameterId, defaultValue));
+      }
+    },
+  );
 
 export const SET_PARAMETER_REQUIRED =
   "metabase/dashboard/SET_PARAMETER_REQUIRED";

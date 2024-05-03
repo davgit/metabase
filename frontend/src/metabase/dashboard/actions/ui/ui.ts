@@ -1,3 +1,4 @@
+import type { ShowClickBehaviorSidebarAction } from "metabase/dashboard/actions/ui/types";
 import { SIDEBAR_NAME } from "metabase/dashboard/constants";
 import { createAction, createThunkAction } from "metabase/lib/redux";
 import type { DashCardId } from "metabase-types/api";
@@ -7,9 +8,8 @@ import type {
   GetState,
 } from "metabase-types/store";
 
-import { getSidebar } from "../selectors";
-
-import { closeAutoApplyFiltersToast } from "./parameters";
+import { getSidebar } from "../../selectors";
+import { closeAutoApplyFiltersToast } from "../parameters";
 
 export const SET_SIDEBAR = "metabase/dashboard/SET_SIDEBAR";
 export const setSidebar = createAction(SET_SIDEBAR);
@@ -17,7 +17,7 @@ export const setSidebar = createAction(SET_SIDEBAR);
 export const CLOSE_SIDEBAR = "metabase/dashboard/CLOSE_SIDEBAR";
 export const closeSidebar = createAction(CLOSE_SIDEBAR);
 
-export const showClickBehaviorSidebar =
+export const showClickBehaviorSidebar: ShowClickBehaviorSidebarAction =
   (dashcardId: DashCardId | null) => (dispatch: Dispatch) => {
     if (dashcardId != null) {
       dispatch(

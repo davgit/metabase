@@ -140,20 +140,6 @@ let fetchDashboardCancellation;
 
 export const fetchDashboard = createAsyncThunk(
   "metabase/dashboard/FETCH_DASHBOARD",
-  /**
-   * @async
-   * @param {Object} args
-   *   @param {import("metabase-types/api").DashboardId} args.dashId
-   *   @param {Object} [args.queryParams]
-   *   @param getState
-   *   @param dispatch
-   *   @param rejectWithValue
-   *   @param fulfillWithValue
-   *   @param {Object} [args.options]
-   *     @param {boolean} [args.options.preserveParameters=false]
-   *     @param {boolean} [args.options.clearCache=true]
-   * @returns {Promise<import("metabase/dashboard/types").FetchDashboardResult>}
-   */
   async (
     {
       dashId,
@@ -229,7 +215,7 @@ export const fetchDashboard = createAsyncThunk(
         // HACK: this is horrible but the easiest way to get "inline" dashboards up and running
         // pass the dashboard in as dashboardId, and replace the id with [object Object] because
         // that's what it will be when cast to a string
-        result = expandInlineDashboard(loadedDashboard);
+        result = expandInlineDashboard(dashId);
         dashId = result.id = String(dashId);
       } else {
         result = await DashboardApi.get(
@@ -306,11 +292,6 @@ export const fetchDashboard = createAsyncThunk(
 
 export const fetchCardData = createThunkAction(
   FETCH_CARD_DATA,
-  /**
-   *  @param card {import("metabase-types/api").StoreDashCard|import("metabase-types/store/dashboard").StoreDashcard}
-   *  @param dashcard {import("metabase-types/api").DashboardCard}
-   *  @param options {import("./types").FetchCardDataOptions}
-   */
   function (card, dashcard, { reload, clearCache, ignoreCache } = {}) {
     return async function (dispatch, getState) {
       dispatch({
@@ -498,11 +479,6 @@ export const fetchCardData = createThunkAction(
   },
 );
 
-/**
- * @export
- * @async
- * @param {import("./types").FetchDashboardCardDataOptions} args
- */
 export const fetchDashboardCardData =
   ({ isRefreshing = false, ...options } = {}) =>
   (dispatch, getState) => {
