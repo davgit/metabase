@@ -50,7 +50,6 @@ import type { ShowClickBehaviorSidebarAction } from "metabase/dashboard/actions/
 import { getDashboardActions } from "metabase/dashboard/components/DashboardActions";
 import { DashboardGridConnected } from "metabase/dashboard/components/DashboardGrid";
 import { DashboardTabs } from "metabase/dashboard/components/DashboardTabs";
-import { DashboardControls } from "metabase/dashboard/hoc/DashboardControls";
 import {
   getDashboardComplete,
   getCardData,
@@ -281,6 +280,7 @@ class PublicDashboardInner extends Component<PublicDashboardProps> {
       selectedTabId,
       metadata,
       onChangeLocation,
+      embedOptions,
     } = this.props;
 
     const buttons = !isWithinIframe()
@@ -314,6 +314,7 @@ class PublicDashboardInner extends Component<PublicDashboardProps> {
           dashboard?.tabs &&
           dashboard?.tabs?.length > 1 && <DashboardTabs dashboardId={id} />
         }
+        embedOptions={embedOptions}
       >
         <LoadingAndErrorWrapper
           className={cx({
@@ -371,5 +372,4 @@ export const PublicDashboard = _.compose(
   title(
     ({ dashboard }: { dashboard: Dashboard }) => dashboard && dashboard.name,
   ),
-  DashboardControls,
 )(PublicDashboardInner);
