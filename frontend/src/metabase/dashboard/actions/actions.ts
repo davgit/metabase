@@ -17,7 +17,7 @@ import type { Dispatch } from "metabase-types/store";
 import { getDashboardType } from "../utils";
 
 import { setDashCardAttributes } from "./core";
-import { closeSidebar, setSidebar } from "./ui";
+import { closeSidebar, setSidebar } from "./ui/ui";
 
 type EditableActionButtonAttrs = Pick<
   ActionDashboardCard,

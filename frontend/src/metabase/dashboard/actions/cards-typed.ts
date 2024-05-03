@@ -211,7 +211,11 @@ export const addLinkDashCardToDashboard =
     dispatch(addDashCardToDashboard({ dashId, tabId, dashcardOverrides }));
   };
 
-export const replaceCard =
+export type ReplaceCardOpts = (options: {
+  dashcardId: DashCardId;
+  nextCardId: CardId;
+}) => void;
+export const replaceCard: ReplaceCardOpts =
   ({
     dashcardId,
     nextCardId,

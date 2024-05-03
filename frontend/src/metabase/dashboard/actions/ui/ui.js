@@ -1,9 +1,8 @@
 import { SIDEBAR_NAME } from "metabase/dashboard/constants";
 import { createAction, createThunkAction } from "metabase/lib/redux";
 
-import { getSidebar } from "../selectors";
-
-import { closeAutoApplyFiltersToast } from "./parameters";
+import { getSidebar } from "../../selectors";
+import { closeAutoApplyFiltersToast } from "../parameters";
 
 export const SET_SIDEBAR = "metabase/dashboard/SET_SIDEBAR";
 export const setSidebar = createAction(SET_SIDEBAR);
