@@ -342,9 +342,6 @@ const buildEChartsLineAreaSeries = (
   chartWidth: number,
   renderingContext: RenderingContext,
 ): RegisteredSeriesOption["line"] => {
-  // const stackName =
-  //   settings["stackable.stack_type"] != null ? `area_${yAxisIndex}` : undefined;
-
   const showSeriesValues = seriesSettings?.["show_series_values"];
 
   const isSymbolVisible = getShowSymbol(
