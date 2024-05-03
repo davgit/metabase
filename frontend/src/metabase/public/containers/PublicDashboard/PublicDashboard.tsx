@@ -114,7 +114,9 @@ const _PublicDashboard = ({
 
   const dispatch = useDispatch();
 
-  const hasNoTabs = dashboard?.tabs?.length === 0;
+  // this boolean ensures that we only fetch data for a single tab.
+  // might need more explanation for this in the future
+  const shouldLoadCardsInTab = dashboard?.tabs?.length === 0;
 
   const _initialize = useCallback(async () => {
     if (uuid) {
@@ -138,13 +140,14 @@ const _PublicDashboard = ({
     }
 
     try {
-      console.log("trying fetchDashboardCardData", hasNoTabs);
-      dispatch(fetchDashboardCardData({ reload: false, clearCache: true }));
+      if (shouldLoadCardsInTab) {
+        dispatch(fetchDashboardCardData({ reload: false, clearCache: true }));
+      }
     } catch (error) {
       console.error(error);
       dispatch(setErrorPage(error));
     }
-  }, [hasNoTabs, dispatch, location.query, token, uuid]);
+  }, [shouldLoadCardsInTab, dispatch, location.query, token, uuid]);
 
   useEffect(() => {
     return () => {
@@ -159,19 +162,6 @@ const _PublicDashboard = ({
   });
 
   useEffect(() => {
-    console.log({
-      "dashboardId !== prevProps?.dashboardId":
-        dashboardId !== prevProps?.dashboardId,
-      "!isEqual(prevProps?.selectedTabId, selectedTabId)": !_.isEqual(
-        prevProps?.selectedTabId,
-        selectedTabId,
-      ),
-      "!isEqual(parameterValues, prevProps?.parameterValues)": !_.isEqual(
-        parameterValues,
-        prevProps?.parameterValues,
-      ),
-    });
-
     if (dashboardId !== prevProps?.dashboardId) {
       _initialize();
       return;
