@@ -48,6 +48,7 @@ import {
 import { buildEChartsScatterSeries } from "../scatter/series";
 
 import { getSeriesYAxisIndex } from "./utils";
+import { getTextColorForBackground } from "metabase/lib/colors";
 
 const getBlurLabelStyle = (
   settings: ComputedVisualizationSettings,
@@ -82,6 +83,42 @@ export const getBarLabelLayout =
     return {
       hideOverlap: settings["graph.label_value_frequency"] === "fit",
       dy: labelValue < 0 ? labelOffset : -labelOffset,
+    };
+  };
+
+export const getBarInsideLabelLayout =
+  (
+    dataset: ChartDataset,
+    settings: ComputedVisualizationSettings,
+    seriesDataKey: DataKey,
+  ): SeriesOption["labelLayout"] =>
+  params => {
+    const { dataIndex, rect, labelRect } = params;
+
+    const canFitWithoutRotation =
+      rect.width > labelRect.width && rect.height > labelRect.height;
+    const canFitWithRotation = false;
+    // rect.width > labelRect.height && rect.height > labelRect.width;
+
+    // if (!(canFitWithoutRotation || canFitWithRotation)) {
+    //   return {
+    //     fontSize: 0,
+    //   };
+    // }
+
+    if (dataIndex == null) {
+      return {};
+    }
+
+    const labelValue = dataset[dataIndex][seriesDataKey];
+    if (typeof labelValue !== "number") {
+      return {};
+    }
+
+    return {
+      hideOverlap: settings["graph.label_value_frequency"] === "fit",
+      rotate: 90,
+      // rotate: canFitWithoutRotation ? 0 : 90,
     };
   };
 
@@ -193,6 +230,36 @@ export const buildEChartsLabelOptions = (
   };
 };
 
+export const buildEChartsStackLabelOptions = (
+  seriesModel: SeriesModel,
+  dataset: ChartDataset,
+  yAxisScaleTransforms: NumericAxisScaleTransforms,
+  settings: ComputedVisualizationSettings,
+  renderingContext: RenderingContext,
+): SeriesLabelOption => {
+  return {
+    silent: true,
+    position: "inside",
+    opacity: 1,
+    show: true,
+    fontFamily: renderingContext.fontFamily,
+    fontWeight: CHART_STYLE.seriesLabels.weight,
+    fontSize: CHART_STYLE.seriesLabels.size,
+    color: getTextColorForBackground(
+      seriesModel.color,
+      renderingContext.getColor,
+    ),
+    formatter: getDataLabelFormatter(
+      seriesModel,
+      dataset,
+      yAxisScaleTransforms,
+      settings,
+      seriesModel.dataKey,
+      renderingContext,
+    ),
+  };
+};
+
 export const computeContinuousScaleBarWidth = (
   xAxisModel: TimeSeriesXAxisModel | NumericXAxisModel,
   boundaryWidth: number,
@@ -262,6 +329,13 @@ const buildEChartsBarSeries = (
   const stackName =
     settings["stackable.stack_type"] != null ? `bar_${yAxisIndex}` : undefined;
 
+  const areStackedLabelsEnabled =
+    settings["graph.stack_values"] === "insides" ||
+    settings["graph.stack_values"] === "all";
+  const shouldShowLabels =
+    settings["graph.show_values"] &&
+    (settings["stackable.stack_type"] == null || areStackedLabelsEnabled);
+
   return {
     id: seriesModel.dataKey,
     emphasis: {
@@ -292,15 +366,27 @@ const buildEChartsBarSeries = (
       y: seriesModel.dataKey,
       x: X_AXIS_DATA_KEY,
     },
-    label: buildEChartsLabelOptions(
-      seriesModel,
+    label: areStackedLabelsEnabled
+      ? buildEChartsStackLabelOptions(
+          seriesModel,
+          dataset,
+          yAxisScaleTransforms,
+          settings,
+          renderingContext,
+        )
+      : buildEChartsLabelOptions(
+          seriesModel,
+          dataset,
+          yAxisScaleTransforms,
+          settings,
+          renderingContext,
+          shouldShowLabels,
+        ),
+    labelLayout: getBarInsideLabelLayout(
       dataset,
-      yAxisScaleTransforms,
       settings,
-      renderingContext,
-      settings["graph.show_values"] && settings["stackable.stack_type"] == null,
+      seriesModel.dataKey,
     ),
-    labelLayout: getBarLabelLayout(dataset, settings, seriesModel.dataKey),
     itemStyle: {
       color: seriesModel.color,
     },
@@ -451,6 +537,9 @@ const generateStackOption = (
         signKey === POSITIVE_STACK_TOTAL_DATA_KEY
           ? ("top" as const)
           : ("bottom" as const),
+      color: renderingContext.getColor("text-dark"),
+      textBorderColor: renderingContext.getColor("white"),
+      textBorderWidth: 3,
       show: true,
       formatter: getStackedDataLabelFormatter(
         dataset,
@@ -716,7 +805,9 @@ export const buildEChartsSeries = (
 
   if (
     settings["stackable.stack_type"] === "stacked" &&
-    settings["graph.show_values"]
+    settings["graph.show_values"] &&
+    (settings["graph.stack_values"] === "total" ||
+      settings["graph.stack_values"] === "all")
   ) {
     series.push(
       ...getStackTotalsSeries(
