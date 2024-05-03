@@ -290,10 +290,27 @@ class PublicDashboardInner extends Component<PublicDashboardProps> {
       selectedTabId,
       metadata,
       onChangeLocation,
+      onFullscreenChange,
+      hasNightModeToggle,
+      onNightModeChange,
+      onRefreshPeriodChange,
+      refreshPeriod,
+      setRefreshElapsedHook,
     } = this.props;
 
     const buttons = !isWithinIframe()
-      ? getDashboardActions({ ...this.props, isPublic: true })
+      ? getDashboardActions({
+          dashboard,
+          onFullscreenChange,
+          hasNightModeToggle,
+          onNightModeChange,
+          onRefreshPeriodChange,
+          refreshPeriod,
+          setRefreshElapsedHook,
+          isFullscreen,
+          isNightMode,
+          isPublic: true,
+        })
       : [];
 
     const visibleDashcards = (dashboard?.dashcards ?? []).filter(
