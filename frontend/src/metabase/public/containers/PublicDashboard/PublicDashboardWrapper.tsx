@@ -1,12 +1,7 @@
 import type { Location } from "history";
 import { useEffect } from "react";
-import { useMount } from "react-use";
 
-import { initTabs } from "metabase/dashboard/actions";
-import {
-  parseSlug,
-  useSyncURLSlug,
-} from "metabase/dashboard/components/DashboardTabs/use-sync-url-slug";
+import { parseSlug } from "metabase/dashboard/components/DashboardTabs/use-sync-url-slug";
 import { DashboardControls } from "metabase/dashboard/hoc/DashboardControls";
 import { parseHashOptions } from "metabase/lib/browser";
 import { useDispatch } from "metabase/lib/redux";
@@ -65,14 +60,15 @@ export const PublicDashboardWrapper = DashboardControls(
     }, [dispatch, location]);
 
     const embedOptions = parseHashOptions(location.hash);
+    const initTabId = location ? parseSlug({ location }) : null;
 
-    useSyncURLSlug({ location });
-    useMount(() => dispatch(initTabs({ slug: parseSlug({ location }) })));
+    // useSyncURLSlug({ location });
+    //   useMount(() => dispatch(initTabs({ slug: parseSlug({ location }) })));
 
     return (
       <PublicDashboard
         id={dashboardId}
-        tabId={location ? parseSlug({ location }) : null}
+        tabId={initTabId}
         queryParams={location.query}
         embedOptions={embedOptions}
         hasNightModeToggle={hasNightModeToggle}
