@@ -215,7 +215,7 @@ export type ReplaceCardOpts = (options: {
   dashcardId: DashCardId;
   nextCardId: CardId;
 }) => void;
-export const replaceCard: ReplaceCardOpts =
+export const replaceCard =
   ({
     dashcardId,
     nextCardId,

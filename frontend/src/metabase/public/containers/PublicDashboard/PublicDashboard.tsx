@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
 import cx from "classnames";
+ca;
 import type { Location, LocationDescriptor } from "history";
 import { assoc } from "icepick";
 import { Component } from "react";
