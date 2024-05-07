@@ -324,7 +324,7 @@ describe("dataset transform functions", () => {
         createMockComputedVisualizationSettings({
           "stackable.stack_type": "stacked",
         }),
-      );
+      ).transformedDataset;
 
       expect(result).toEqual([
         {
@@ -355,7 +355,7 @@ describe("dataset transform functions", () => {
         createMockComputedVisualizationSettings({
           "stackable.stack_type": "normalized",
         }),
-      );
+      ).transformedDataset;
 
       expect(result).toEqual([
         {
@@ -392,7 +392,7 @@ describe("dataset transform functions", () => {
               key.card._seriesKey === "series1" ? "zero" : undefined,
           }),
         }),
-      );
+      ).transformedDataset;
 
       expect(result).toEqual([
         {
@@ -444,7 +444,7 @@ describe("dataset transform functions", () => {
               "line.missing": "zero",
             }),
           }),
-        );
+        ).transformedDataset;
 
         expect(result).toEqual([
           {
@@ -474,7 +474,7 @@ describe("dataset transform functions", () => {
               "line.missing": "zero",
             }),
           }),
-        );
+        ).transformedDataset;
 
         expect(result).toHaveLength(dataset.length);
       });
@@ -493,7 +493,7 @@ describe("dataset transform functions", () => {
           }),
           "stackable.stack_type": "stacked",
         }),
-      );
+      ).transformedDataset;
 
       expect(result).toEqual([]);
     });
