@@ -363,9 +363,11 @@ export function createVirtualCard(display: VirtualCardDisplay): VirtualCard {
   };
 }
 
-export const getDashboardId = (dashboard: Dashboard): number => {
+export const getDashboardIdForCacheConfig = (dashboard: Dashboard): number => {
   if (typeof dashboard.id === "string") {
-    throw new Error("This dashboard has an invalid id");
+    throw new Error(
+      "Dashboards with string ids cannot have cache configurations",
+    );
   }
   const dashboardId: number = dashboard.id;
   return dashboardId;
