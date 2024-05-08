@@ -24,7 +24,10 @@ import {
   MetabaseApi,
   maybeUsePivotEndpoint,
 } from "metabase/services";
-import { getParameterValuesBySlug } from "metabase-lib/v1/parameters/utils/parameter-values";
+import {
+  getLocalDashboardParametersById,
+  getParameterValuesBySlug,
+} from "metabase-lib/v1/parameters/utils/parameter-values";
 import { applyParameters } from "metabase-lib/v1/queries/utils/card";
 
 import { DASHBOARD_SLOW_TIMEOUT } from "../constants";
@@ -269,9 +272,16 @@ export const fetchDashboard = createAsyncThunk(
         questions,
       );
 
+      const recentlyUsedDashboardParameters =
+        getLocalDashboardParametersById(dashId);
+
       const parameterValuesById = preserveParameters
         ? getParameterValues(getState())
-        : getParameterValuesByIdFromQueryParams(parameters, queryParams);
+        : getParameterValuesByIdFromQueryParams(
+            parameters,
+            queryParams,
+            recentlyUsedDashboardParameters,
+          );
 
       entities = entities ?? normalize(result, dashboard).entities;
 
