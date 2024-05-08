@@ -30,6 +30,7 @@ import type {
   VirtualCardDisplay,
   VirtualDashboardCard,
   Dashboard,
+  CacheableDashboard,
 } from "metabase-types/api";
 import type { SelectedTabId } from "metabase-types/store";
 
@@ -363,12 +364,6 @@ export function createVirtualCard(display: VirtualCardDisplay): VirtualCard {
   };
 }
 
-export const getDashboardIdForCacheConfig = (dashboard: Dashboard): number => {
-  if (typeof dashboard.id === "string") {
-    throw new Error(
-      "Dashboards with string ids cannot have cache configurations",
-    );
-  }
-  const dashboardId: number = dashboard.id;
-  return dashboardId;
-};
+export const isDashboardCacheable = (
+  dashboard: Dashboard,
+): dashboard is CacheableDashboard => typeof dashboard.id !== "string";

@@ -6,14 +6,13 @@ import _ from "underscore";
 import { useCacheConfigs } from "metabase/admin/performance/hooks/useCacheConfigs";
 import { getShortStrategyLabel } from "metabase/admin/performance/strategies";
 import { DelayedLoadingAndErrorWrapper } from "metabase/components/LoadingAndErrorWrapper/DelayedLoadingAndErrorWrapper";
-import { getDashboardIdForCacheConfig } from "metabase/dashboard/utils";
 import { Button, Flex } from "metabase/ui";
-import type { Dashboard, Model } from "metabase-types/api";
+import type { CacheableDashboard, Model } from "metabase-types/api";
 
 const configurableModels: Model[] = ["dashboard"];
 
 type DashboardCacheSectionProps = {
-  dashboard: Dashboard;
+  dashboard: CacheableDashboard;
   setPage: Dispatch<SetStateAction<"default" | "caching">>;
 };
 
@@ -21,16 +20,14 @@ export const DashboardCacheSection = ({
   dashboard,
   setPage,
 }: DashboardCacheSectionProps) => {
-  const dashboardId = getDashboardIdForCacheConfig(dashboard);
-
   const { configs, loading, error } = useCacheConfigs({
     configurableModels,
-    id: dashboardId,
+    id: dashboard.id,
   });
 
   const targetConfig = useMemo(
-    () => _.findWhere(configs, { model_id: dashboardId }),
-    [configs, dashboardId],
+    () => _.findWhere(configs, { model_id: dashboard.id }),
+    [configs, dashboard.id],
   );
   const savedStrategy = targetConfig?.strategy;
 

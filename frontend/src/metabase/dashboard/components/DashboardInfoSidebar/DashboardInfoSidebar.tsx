@@ -12,6 +12,7 @@ import {
   toggleAutoApplyFilters,
   updateDashboard,
 } from "metabase/dashboard/actions";
+import { isDashboardCacheable } from "metabase/dashboard/utils";
 import { useUniqueId } from "metabase/hooks/use-unique-id";
 import { useDispatch, useSelector } from "metabase/lib/redux";
 import MetabaseSettings from "metabase/lib/settings";
@@ -104,6 +105,8 @@ const DashboardInfoSidebarBody = ({
 
   const autoApplyFilterToggleId = useUniqueId();
   const canWrite = dashboard.can_write;
+
+  const isCacheable = isDashboardCacheable(dashboard);
   return (
     <>
       <ContentSection>
@@ -133,7 +136,7 @@ const DashboardInfoSidebarBody = ({
             checked={dashboard.auto_apply_filters}
             onChange={e => handleToggleAutoApplyFilters(e.target.checked)}
           />
-          {showCaching && (
+          {showCaching && isCacheable && (
             <DashboardCacheSection dashboard={dashboard} setPage={setPage} />
           )}
         </Stack>
