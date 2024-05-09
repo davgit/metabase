@@ -164,6 +164,34 @@
      :aggregations    0
      :breakouts       0}
 
+    :test.query/products-native
+    {:query          (-> (lib/native-query metadata-provider "SELECT * FROM products")
+                         (assoc-in [:stages 0 :lib/stage-metadata]
+                                   {:columns (->> (meta/fields :products)
+                                                  (map #(meta/field-metadata :products %))
+                                                  (sort-by :position)
+                                                  (map #(select-keys % [:lib/type :name :display-name :field-ref
+                                                                        :base-type :effective-type :semantic-type])))
+                                    #_[{:lib/type :metadata/column, :name "ID",         :base-type :type/Integer}
+                                              {:lib/type :metadata/column, :name "EAN",        :base-type :type/Text}
+                                              {:lib/type :metadata/column, :name "TITLE",      :base-type :type/Text}
+                                              {:lib/type :metadata/column, :name "CATEGORY",   :base-type :type/Text}
+                                              {:lib/type :metadata/column, :name "VENDOR",     :base-type :type/Text}
+                                              {:lib/type :metadata/column, :name "PRICE",      :base-type :type/Float}
+                                              {:lib/type :metadata/column, :name "RATING",     :base-type :type/Float}
+                                              {:lib/type :metadata/column, :name "CREATED_AT", :base-type :type/DateTime}]}))
+     :native?        true
+     :row            {"ID"         "3"
+                      "EAN"        "4966277046676"
+                      "TITLE"      "Synergistic Granite Chair"
+                      "CATEGORY"   "Doohickey"
+                      "VENDOR"     "Murray, Watsica and Wunsch"
+                      "PRICE"      35.38
+                      "RATING"     4
+                      "CREATED_AT" "2024-09-08T22:03:20.239+03:00"}
+     :aggregations    0
+     :breakouts       0}
+
     :test.query/reviews
     {:query          (lib/query metadata-provider (meta/table-metadata :reviews))
      :row            {"ID"         "301"
@@ -311,6 +339,22 @@
             (click tc :header "RATING"     :basic :number)
             (click tc :header "CREATED_AT" :basic :datetime)])
 
+         ;; Native query against products
+         (let [tc (test-case metadata-provider :test.query/products-native)]
+           [(click tc :cell "ID"         :basic :pk)
+            (click tc :cell "EAN"        :basic :string)
+            (click tc :cell "TITLE"      :basic :string)
+            (click tc :cell "PRICE"      :basic :number)
+            (click tc :cell "RATING"     :basic :number)
+            (click tc :cell "CREATED_AT" :basic :datetime)
+
+            (click tc :header "ID"         :basic :pk)
+            (click tc :header "EAN"        :basic :string)
+            (click tc :header "TITLE"      :basic :string)
+            (click tc :header "PRICE"      :basic :number)
+            (click tc :header "RATING"     :basic :number)
+            (click tc :header "CREATED_AT" :basic :datetime)])
+
          ;; Simple query against Reviews.
          ;; This one has a :type/Description column (BODY) which matters for Distribution drills.
          (let [tc (test-case metadata-provider :test.query/reviews)]
@@ -400,3 +444,22 @@
        (is (=? (when exp?
                  {:type drill})
                (returned tc context drill)))))))
+
+(comment
+  (let [tc (test-case meta/metadata-provider :test.query/products-native)]
+    (cell-click tc "ID")
+    #_(header-click tc column-name)
+    #_(legend-click tc column-name)
+    #_(pivot-click tc)
+           #_[(click tc :cell "ID"         :basic :pk)
+            #_(click tc :cell "EAN"        :basic :string)
+            #_(click tc :cell "TITLE"      :basic :string)
+            #_(click tc :cell "PRICE"      :basic :number)
+            #_(click tc :cell "RATING"     :basic :number)
+            #_(click tc :cell "CREATED_AT" :basic :datetime)
+            #_(click tc :header "ID"         :basic :pk)
+            #_(click tc :header "EAN"        :basic :string)
+            #_(click tc :header "TITLE"      :basic :string)
+            #_(click tc :header "PRICE"      :basic :number)
+            #_(click tc :header "RATING"     :basic :number)
+            #_(click tc :header "CREATED_AT" :basic :datetime)]))
