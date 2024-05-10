@@ -212,7 +212,8 @@
   "Calls Store and returns {:external_id ,,, :upload_url ,,,}."
   []
   (-> (metabase-store-migration-url)
-      (http/post {:form-params  {:local_mb_version (or (migration-dump-version)
+      (http/post {:form-params  {:local_mb_version (or "v0.49.7" ;; NOCOMMIT: remove before merge
+                                                       (migration-dump-version)
                                                        (config/mb-version-info :tag))}
                   :content-type :json})
       :body
