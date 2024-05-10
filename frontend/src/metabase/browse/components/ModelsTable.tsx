@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { push } from "react-router-redux";
 import { t } from "ttag";
 
+import { useUserSetting } from "metabase/common/hooks";
 import EntityItem from "metabase/components/EntityItem";
 import {
   SortableColumnHeader,
@@ -30,7 +31,12 @@ import { getCollectionName, getIcon } from "../utils";
 import { CollectionBreadcrumbsWithTooltip } from "./CollectionBreadcrumbsWithTooltip";
 import { EllipsifiedWithMarkdown } from "./EllipsifiedWithMarkdown";
 import { ModelTableRow } from "./ModelsTable.styled";
-import { getModelDescription, sortModels } from "./utils";
+import {
+  getModelDescription,
+  isValidSortColumn,
+  isValidSortDirection,
+  sortModels,
+} from "./utils";
 
 export interface ModelsTableProps {
   models: ModelResult[];
@@ -59,6 +65,50 @@ export const ModelsTable = ({ models }: ModelsTableProps) => {
     DEFAULT_SORTING_OPTIONS,
   );
 
+  const [persistedSortColumn, setPersistedSortColumn] = useUserSetting(
+    "browse-models-sort-column",
+    { debounceOnLeadingEdge: true },
+  );
+  const [persistedSortDirection, setPersistedSortDirection] = useUserSetting(
+    "browse-models-sort-direction",
+    { debounceOnLeadingEdge: true },
+  );
+
+  const updateSortingOptions = ({
+    sort_column,
+    sort_direction,
+  }: SortingOptions) => {
+    setSortingOptions({ sort_column, sort_direction });
+    setPersistedSortColumn(sort_column);
+    setPersistedSortDirection(sort_direction);
+  };
+
+  useEffect(() => {
+    if (persistedSortColumn) {
+      if (isValidSortColumn(persistedSortColumn)) {
+        setSortingOptions(options => ({
+          ...options,
+          sort_column: persistedSortColumn,
+        }));
+      } else {
+        console.error("Invalid sort column:", persistedSortColumn);
+      }
+    }
+  }, [persistedSortColumn, setSortingOptions]);
+
+  useEffect(() => {
+    if (persistedSortDirection) {
+      if (isValidSortDirection(persistedSortDirection)) {
+        setSortingOptions(options => ({
+          ...options,
+          sort_direction: persistedSortDirection,
+        }));
+      } else {
+        console.error("Invalid sort direction:", persistedSortDirection);
+      }
+    }
+  }, [persistedSortDirection, setSortingOptions]);
+
   const sortedModels = sortModels(models, sortingOptions, localeCode);
 
   return (
@@ -79,7 +129,7 @@ export const ModelsTable = ({ models }: ModelsTableProps) => {
         <tr>
           <Columns.Name.Header
             sortingOptions={sortingOptions}
-            onSortingOptionsChange={setSortingOptions}
+            onSortingOptionsChange={updateSortingOptions}
           />
           <SortableColumnHeader name="description" {...descriptionProps}>
             {t`Description`}
@@ -87,7 +137,7 @@ export const ModelsTable = ({ models }: ModelsTableProps) => {
           <SortableColumnHeader
             name="collection"
             sortingOptions={sortingOptions}
-            onSortingOptionsChange={setSortingOptions}
+            onSortingOptionsChange={updateSortingOptions}
             {...collectionProps}
           >
             {t`Collection`}
