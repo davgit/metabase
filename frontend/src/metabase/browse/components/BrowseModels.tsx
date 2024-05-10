@@ -76,17 +76,14 @@ export const BrowseModelsBody = ({
   };
   const { data, error, isLoading } = useSearchQuery(query);
 
-  const { modelsWithoutMetabaseAnalytics, filteredModels } = useMemo(() => {
+  const { unfilteredModels, filteredModels } = useMemo(() => {
     const unfilteredModels = (data?.data as ModelResult[]) ?? [];
-    const modelsWithoutMetabaseAnalytics = unfilteredModels.filter(
-      model => model.collection.id !== 1,
-    );
     const filteredModels = filterModels(
-      modelsWithoutMetabaseAnalytics,
+      unfilteredModels,
       actualModelFilters,
       availableModelFilters,
     );
-    return { modelsWithoutMetabaseAnalytics, filteredModels };
+    return { unfilteredModels, filteredModels };
   }, [data, actualModelFilters]);
 
   if (error || isLoading) {
@@ -103,9 +100,7 @@ export const BrowseModelsBody = ({
     return (
       <Stack mb="lg" spacing="md">
         <ModelExplanationBanner />
-        <RecentlyViewedModels
-          modelCount={modelsWithoutMetabaseAnalytics.length}
-        />
+        <RecentlyViewedModels modelCount={unfilteredModels.length} />
         <ModelsTable models={filteredModels} />
       </Stack>
     );
