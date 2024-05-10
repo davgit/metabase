@@ -2,11 +2,7 @@ import { t } from "ttag";
 
 import type { SortingOptions } from "metabase/components/ItemsTable/BaseItemsTable";
 import { SortDirection } from "metabase/components/ItemsTable/Columns";
-import type {
-  CollectionEssentials,
-  ModelResult,
-  SearchResult,
-} from "metabase-types/api";
+import type { CollectionEssentials, ModelResult } from "metabase-types/api";
 
 import { getCollectionName } from "../utils";
 
@@ -36,15 +32,8 @@ export const getBreadcrumbMaxWidths = (
   ];
 };
 
-export const isModel = (item: SearchResult) => item.model === "dataset";
-
-export const getModelDescription = (item: SearchResult) => {
-  if (item.collection && isModel(item) && !item.description?.trim()) {
-    return t`A model`;
-  } else {
-    return item.description;
-  }
-};
+export const getModelDescription = (item: Partial<ModelResult>) =>
+  item.description?.trim() ? item.description : t`A model`;
 
 export const getCollectionPathString = (collection: CollectionEssentials) => {
   const ancestors: CollectionEssentials[] =
@@ -108,4 +97,17 @@ export const sortModels = (
 
     return sort_direction === SortDirection.Asc ? result : -result;
   });
+};
+
+export const getCountOfRecentlyViewedModelsToShow = (
+  /** How many models the user has permission to see (ignoring Metabase analytics models which are never shown) */
+  modelCount: number,
+) => {
+  if (modelCount > 20) {
+    return 8;
+  }
+  if (modelCount > 9) {
+    return 4;
+  }
+  return 0;
 };

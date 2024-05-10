@@ -5,7 +5,11 @@ import {
   createMockModelResult,
 } from "metabase-types/api/mocks";
 
-import { getCollectionPathString, sortModels } from "./utils";
+import {
+  getCollectionPathString,
+  getCountOfRecentlyViewedModelsToShow,
+  sortModels,
+} from "./utils";
 
 describe("getCollectionPathString", () => {
   it("should return path for collection without ancestors", () => {
@@ -149,5 +153,23 @@ describe("sortModels", () => {
         modelMap["model named B, with collection path D / E / F"],
       ]);
     });
+  });
+});
+
+describe("getCountOfRecentlyViewedModelsToShow", () => {
+  test("returns 8 for modelCount greater than 20", () => {
+    expect(getCountOfRecentlyViewedModelsToShow(21)).toBe(8);
+    expect(getCountOfRecentlyViewedModelsToShow(100)).toBe(8);
+  });
+
+  test("returns 4 for modelCount greater than 9 and less than or equal to 20", () => {
+    expect(getCountOfRecentlyViewedModelsToShow(10)).toBe(4);
+    expect(getCountOfRecentlyViewedModelsToShow(20)).toBe(4);
+  });
+
+  test("returns 0 for modelCount of 9 or less", () => {
+    expect(getCountOfRecentlyViewedModelsToShow(0)).toBe(0);
+    expect(getCountOfRecentlyViewedModelsToShow(5)).toBe(0);
+    expect(getCountOfRecentlyViewedModelsToShow(9)).toBe(0);
   });
 });

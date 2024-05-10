@@ -6,7 +6,7 @@ import { useIsTruncated } from "metabase/hooks/use-is-truncated";
 
 import { EllipsifiedRoot } from "./Ellipsified.styled";
 
-interface EllipsifiedProps {
+export interface EllipsifiedProps {
   style?: CSSProperties;
   className?: string;
   showTooltip?: boolean;
@@ -18,6 +18,7 @@ interface EllipsifiedProps {
   placement?: Placement;
   "data-testid"?: string;
   id?: string;
+  hideOverflowXOnly?: boolean;
 }
 
 export const Ellipsified = ({
@@ -32,6 +33,7 @@ export const Ellipsified = ({
   placement = "top",
   "data-testid": dataTestId,
   id,
+  hideOverflowXOnly = false,
 }: EllipsifiedProps) => {
   const canSkipTooltipRendering = !showTooltip && !alwaysShowTooltip;
   const { isTruncated, ref } = useIsTruncated<HTMLDivElement>({
@@ -52,6 +54,7 @@ export const Ellipsified = ({
         style={style}
         data-testid={dataTestId}
         id={id}
+        hideOverflowXOnly={hideOverflowXOnly}
       >
         {children}
       </EllipsifiedRoot>

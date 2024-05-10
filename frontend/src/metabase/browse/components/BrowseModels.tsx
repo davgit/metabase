@@ -21,8 +21,9 @@ import {
 } from "./BrowseContainer.styled";
 import { ModelExplanationBanner } from "./ModelExplanationBanner";
 import { ModelsTable } from "./ModelsTable";
+import { RecentlyViewedModels } from "./RecentlyViewedModels";
 
-const { availableModelFilters, useModelFilterSettings } =
+const { availableModelFilters, useModelFilterSettings, ModelFilterControls } =
   PLUGIN_CONTENT_VERIFICATION;
 
 export const BrowseModels = () => {
@@ -45,7 +46,7 @@ export const BrowseModels = () => {
                 {t`Models`}
               </Group>
             </Title>
-            <PLUGIN_CONTENT_VERIFICATION.ModelFilterControls
+            <ModelFilterControls
               actualModelFilters={actualModelFilters}
               setActualModelFilters={setActualModelFilters}
             />
@@ -75,14 +76,17 @@ export const BrowseModelsBody = ({
   };
   const { data, error, isLoading } = useSearchQuery(query);
 
-  const models = useMemo(() => {
+  const { modelsWithoutMetabaseAnalytics, filteredModels } = useMemo(() => {
     const unfilteredModels = (data?.data as ModelResult[]) ?? [];
+    const modelsWithoutMetabaseAnalytics = unfilteredModels.filter(
+      model => model.collection.id !== 1,
+    );
     const filteredModels = filterModels(
-      unfilteredModels || [],
+      modelsWithoutMetabaseAnalytics,
       actualModelFilters,
       availableModelFilters,
     );
-    return filteredModels;
+    return { modelsWithoutMetabaseAnalytics, filteredModels };
   }, [data, actualModelFilters]);
 
   if (error || isLoading) {
@@ -95,11 +99,14 @@ export const BrowseModelsBody = ({
     );
   }
 
-  if (models.length) {
+  if (filteredModels.length) {
     return (
-      <Stack spacing="md" mb="lg">
+      <Stack mb="lg" spacing="md">
         <ModelExplanationBanner />
-        <ModelsTable models={models} />
+        <RecentlyViewedModels
+          modelCount={modelsWithoutMetabaseAnalytics.length}
+        />
+        <ModelsTable models={filteredModels} />
       </Stack>
     );
   }
