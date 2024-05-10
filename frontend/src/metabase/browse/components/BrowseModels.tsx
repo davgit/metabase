@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { t } from "ttag";
 
 import NoResults from "assets/img/no_results.svg";
-import type { ModelResult, SearchRequest } from "metabase-types/api";
 import { useSearchQuery } from "metabase/api";
 import LoadingAndErrorWrapper from "metabase/components/LoadingAndErrorWrapper";
 import { color } from "metabase/lib/colors";
 import { PLUGIN_CONTENT_VERIFICATION } from "metabase/plugins";
 import { Box, Flex, Group, Icon, Stack, Title } from "metabase/ui";
+import type { ModelResult, SearchRequest } from "metabase-types/api";
 
 import type { ActualModelFilters } from "../utils";
 import { filterModels } from "../utils";
@@ -17,11 +17,10 @@ import {
   BrowseHeader,
   BrowseMain,
   BrowseSection,
-  CenteredEmptyState
+  CenteredEmptyState,
 } from "./BrowseContainer.styled";
 import { ModelExplanationBanner } from "./ModelExplanationBanner";
 import { ModelsTable } from "./ModelsTable";
-import { RecentlyViewedModels } from "./RecentlyViewedModels";
 
 const { availableModelFilters, useModelFilterSettings, ModelFilterControls } =
   PLUGIN_CONTENT_VERIFICATION;
@@ -76,17 +75,14 @@ export const BrowseModelsBody = ({
   };
   const { data, error, isLoading } = useSearchQuery(query);
 
-  const { modelsWithoutMetabaseAnalytics, filteredModels } = useMemo(() => {
+  const filteredModels = useMemo(() => {
     const unfilteredModels = (data?.data as ModelResult[]) ?? [];
-    const modelsWithoutMetabaseAnalytics = unfilteredModels.filter(
-      model => model.collection.id !== 1,
-    );
     const filteredModels = filterModels(
-      modelsWithoutMetabaseAnalytics,
+      unfilteredModels,
       actualModelFilters,
       availableModelFilters,
     );
-    return { modelsWithoutMetabaseAnalytics, filteredModels };
+    return filteredModels;
   }, [data, actualModelFilters]);
 
   if (error || isLoading) {
@@ -103,9 +99,6 @@ export const BrowseModelsBody = ({
     return (
       <Stack mb="lg" spacing="md">
         <ModelExplanationBanner />
-        <RecentlyViewedModels
-          modelCount={modelsWithoutMetabaseAnalytics.length}
-        />
         <ModelsTable models={filteredModels} />
       </Stack>
     );
