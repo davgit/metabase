@@ -26,6 +26,9 @@ export const ModelCard = ({ model, icon }: ModelCardProps) => {
   icon ??= getIcon(model);
   const description = getModelDescription(model);
 
+  // FIXME: Add an 8x8 blue dot to the filter popover
+  // Use the Dot component
+
   return (
     <Link
       key={model.id}
@@ -39,12 +42,12 @@ export const ModelCard = ({ model, icon }: ModelCardProps) => {
             {model.name}
           </Ellipsified>
         </Text>
-        {description ? (
+        {description
+          // FIXME: This ellipsifies too readily
+          ? (
           <EllipsifiedWithMarkdown
             hideOverflowXOnly
-            multiline
             style={{
-              height: "3rem",
               lineHeight: "1rem",
               fontSize: "11px",
               width: "100%",

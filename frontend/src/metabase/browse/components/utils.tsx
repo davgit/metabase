@@ -33,7 +33,7 @@ export const getBreadcrumbMaxWidths = (
 };
 
 export const getModelDescription = (item: Partial<ModelResult>) =>
-  item.description?.trim() ? item.description : t`A model`;
+  item.description?.trim() || t`A model`;
 
 export const getCollectionPathString = (collection: CollectionEssentials) => {
   const ancestors: CollectionEssentials[] =

@@ -16,6 +16,10 @@ export const RecentlyViewedModels = ({
    * depends on the number of models shown in the table below. */
   modelCount: number;
 }) => {
+
+  // TODO: the filter from the popover should apply here
+  // Ensure that 'A model' appears
+
   const cap = getCountOfRecentlyViewedModelsToShow(modelCount);
 
   const {

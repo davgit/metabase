@@ -36,7 +36,7 @@ export const ModelCardBody = styled(Card)`
   padding: 1.5rem;
   padding-bottom: 1rem;
 
-  height: 7.5rem;
+  height: 6.5rem;
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
