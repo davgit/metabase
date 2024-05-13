@@ -22,6 +22,7 @@ export const useUserSetting = <T extends keyof UserSettings>(
     debounceOnLeadingEdge,
   }: {
     shouldRefresh?: boolean;
+    /** If true, only the first value retrieved from the API will be used */
     shouldMemoize?: boolean;
     shouldDebounce?: boolean;
     debounceTimeout?: number;
